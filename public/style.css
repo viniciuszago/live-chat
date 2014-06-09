@@ -111,6 +111,8 @@ ul {
 .chatArea {
   height: 100%;
   padding-bottom: 60px;
+  float:left;
+  min-width: 800px;
 }
 
 .messages {

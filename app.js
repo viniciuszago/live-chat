@@ -13,12 +13,13 @@ server.listen(port, function () {
 app.use(express.static(__dirname + '/public'));
 
 // Chatroom
+var chat = io.of('/chat');
 
-// usernames which are currently connected to the chat
-var usernames = {};
+// users which are currently connected to the chat
+var users = {};
 var numUsers = 0;
 
-io.on('connection', function (socket) {
+chat.on('connection', function (socket) {
   var addedUser = false;
 
   // when the client emits 'new message', this listens and executes
@@ -30,50 +31,68 @@ io.on('connection', function (socket) {
     });
   });
 
+
   // when the client emits 'add user', this listens and executes
   socket.on('add user', function (username) {
     // we store the username in the socket session for this client
     socket.username = username;
+
     // add the client's username to the global list
-    usernames[username] = username;
+    users[username] = {
+    	'name': username,
+      'id': socket.id
+    }
     ++numUsers;
     addedUser = true;
     socket.emit('login', {
       numUsers: numUsers
     });
-    // // echo globally (all clients) that a person has connected
-    // socket.broadcast.emit('user joined', {
-    //   username: socket.username,
-    //   numUsers: numUsers
-    // });
+
+    console.log(username + " connected");
+    console.log("users connected: " + numUsers);
+
+    emitClientList();  	
   });
 
-  // // when the client emits 'typing', we broadcast it to others
-  // socket.on('typing', function () {
-  //   socket.broadcast.emit('typing', {
-  //     username: socket.username
-  //   });
-  // });
+  socket.on("remove_user", function(username){
+  	// remove the username from global users list
+  	if (addedUser) {
+  		var user = users[username];
+  		if(user != undefined)
+      	socket.broadcast.to(user.id).emit( 'kicked_off' );
 
-  // // when the client emits 'stop typing', we broadcast it to others
-  // socket.on('stop typing', function () {
-  //   socket.broadcast.emit('stop typing', {
-  //     username: socket.username
-  //   });
-  // });
+      delete users[username];
+      --numUsers;
+
+      emitClientList();
+      console.log(username + " kicked off");
+    }
+  });
 
   // when the user disconnects.. perform this
   socket.on('disconnect', function () {
-    // remove the username from global usernames list
+    // remove the username from global users list
     if (addedUser) {
-      delete usernames[socket.username];
+      delete users[socket.username];
       --numUsers;
 
-      // echo globally that this client has left
-      // socket.broadcast.emit('user left', {
-      //   username: socket.username,
-      //   numUsers: numUsers
-      // });
+      emitClientList();
+
+      console.log("users connected: " + numUsers);
+      console.log(socket.username + " disconnected");
     }
   });
+
+  function emitClientList(){
+  	var user = users.test;
+    if(user != undefined){
+    	if(socket.username == user.name){
+    		socket.emit( 'clients', { users: users } );
+    	}
+    	else
+    	{
+    		socket.broadcast.to(user.id).emit( 'clients', { users: users } );			
+    	}
+    }
+  }
 });
