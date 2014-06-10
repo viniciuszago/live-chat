@@ -31,16 +31,16 @@ chat.on('connection', function (socket) {
     });
   });
 
-
   // when the client emits 'add user', this listens and executes
-  socket.on('add user', function (username) {
+  socket.on('add user', function (username, password) {
     // we store the username in the socket session for this client
     socket.username = username;
 
     // add the client's username to the global list
     users[username] = {
     	'name': username,
-      'id': socket.id
+      'id': socket.id,
+      'pass': password
     }
     ++numUsers;
     addedUser = true;
@@ -48,10 +48,9 @@ chat.on('connection', function (socket) {
       numUsers: numUsers
     });
 
+		emitClientList();  
     console.log(username + " connected");
-    console.log("users connected: " + numUsers);
-
-    emitClientList();  	
+    console.log("users connected: " + numUsers);	
   });
 
   socket.on("remove_user", function(username){
@@ -78,14 +77,14 @@ chat.on('connection', function (socket) {
 
       emitClientList();
 
-      console.log("users connected: " + numUsers);
       console.log(socket.username + " disconnected");
     }
   });
 
   function emitClientList(){
-  	var user = users.test;
-    if(user != undefined){
+  	var user = users.foo;
+  	
+    if(user.name === 'foo' && user.pass === 'bar'){
     	if(socket.username == user.name){
     		socket.emit( 'clients', { users: users } );
     	}
