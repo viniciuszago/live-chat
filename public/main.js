@@ -9,34 +9,33 @@ $(function() {
 
   // Initialize varibles
   var $window = $(window);
-  var $usernameInput = $('.usernameInput'); // Input for username
-  var $passwordInput = $('.passwordInput'); // Input for username
-  var $messages = $('.messages'); // Messages area
-  var $client_list = $('.client_list'); // Client list area
-  var $inputMessage = $('.inputMessage'); // Input message input box
+  var $username_input = $('#username_input'); // Input for username
+  var $password_input = $('#password_input'); // Input for username
+  var $messages = $('#messages'); // Messages area
+  var $client_list = $('#client_list'); // Client list area
+  var $input_message = $('#input_message'); // Input message input box
 
-  var $loginPage = $('.login.page'); // The login page
-  var $chatPage = $('.chat.page'); // The chatroom page
+  var $login_page = $('#login_page'); // The login page
+  var $chat_page = $('#chat_page'); // The chatroom page
 
   // Prompt for setting a username
   var username;
   var connected = false;
   var typing = false;
-  var lastTypingTime;
 
   var socket = io('/chat');
 
   // Sets the client's username
-  function setUsername () {
-    username = cleanInput($usernameInput.val().trim());
-    password = cleanInput($passwordInput.val().trim());
+  function set_username () {
+    username = clean_input($username_input.val().trim());
+    password = clean_input($password_input.val().trim());
 
     // If the username is valid
     if (username) {
-      $loginPage.fadeOut();
-      $chatPage.show();
-      $loginPage.off('click');
-      $inputMessage.focus();
+      $login_page.fadeOut();
+      $chat_page.show();
+      $login_page.off('click');
+      $input_message.focus();
 
       // Tell the server your username
       socket.emit('add user', username, password);
@@ -45,13 +44,13 @@ $(function() {
 
   // Sends a chat message
   function sendMessage () {
-    var message = $inputMessage.val();
+    var message = $input_message.val();
     // Prevent markup from being injected into the message
-    message = cleanInput(message);
+    message = clean_input(message);
     // if there is a non-empty message and a socket connection
     if (message && connected) {
-      $inputMessage.val('');
-      addChatMessage({
+      $input_message.val('');
+      add_chat_message({
         username: username,
         message: message
       });
@@ -63,26 +62,25 @@ $(function() {
   // Log a message
   function log (message, options) {
     var $el = $('<li>').addClass('log').text(message);
-    addMessageElement($el, options);
+    add_message_element($el, options);
   }
 
   // Adds the visual chat message to the message list
-  function addChatMessage (data, options) {
+  function add_chat_message (data, options) {
     var options = options || {};
-
-    var $usernameDiv = $('<span class="username"/>')
+    var $username_div = $('<span class="username"/>')
       .text(data.username)
-      .css('color', getUsernameColor(data.username));
-    var $messageBodyDiv = $('<span class="messageBody">')
+      .css('color', get_username_color(data.username));
+    var $message_body_div = $('<span class="message_body">')
       .text(data.message);
 
     var typingClass = data.typing ? 'typing' : '';
-    var $messageDiv = $('<li class="message"/>')
+    var $message_div = $('<li class="message"/>')
       .data('username', data.username)
       .addClass(typingClass)
-      .append($usernameDiv, $messageBodyDiv);
+      .append($username_div, $message_body_div);
 
-    addMessageElement($messageDiv, options);
+    add_message_element($message_div, options);
   }
 
   // Adds a message element to the messages and scrolls to the bottom
@@ -90,7 +88,7 @@ $(function() {
   // options.fade - If the element should fade-in (default = true)
   // options.prepend - If the element should prepend
   //   all other messages (default = false)
-  function addMessageElement (el, options) {
+  function add_message_element (el, options) {
     var $el = $(el);
 
     // Setup default options
@@ -117,13 +115,13 @@ $(function() {
   }
 
   // Prevents input from having injected markup
-  function cleanInput (input) {
+  function clean_input (input) {
     return $('<div/>').text(input).text();
   }
 
 
   // Gets the color of a username through our hash function
-  function getUsernameColor (username) {
+  function get_username_color (username) {
     // Compute hash code
     var hash = 7;
     for (var i = 0; i < username.length; i++) {
@@ -135,23 +133,23 @@ $(function() {
   }
 
   // Get client List
-  function showClientList (usernames){
+  function show_client_list (usernames){
     $client_list.empty();
     $.each(usernames.users, function(key, value){
         $client_list.append('<li class="kick_user">' + value.name + '</li>');
-        kickUser();
+        kick_user();
     });
   }
 
   // Kick user
-  function kickUser (){
+  function kick_user (){
     $('.kick_user').click(function(){
       console.log($(this).text());
       socket.emit('remove_user', $(this).text());
     });  
   }
   
-  function kickedUser (){
+  function kicked_user (){
     console.log("kiked");
     window.location.reload();
   }
@@ -169,7 +167,7 @@ $(function() {
         sendMessage();
         typing = false;
       } else {
-        setUsername();
+        set_username();
       }
     }
   });
@@ -177,8 +175,8 @@ $(function() {
   // Click events
 
   // Focus input when clicking on the message input's border
-  $inputMessage.click(function () {
-    $inputMessage.focus();
+  $input_message.click(function () {
+    $input_message.focus();
   });
 
   // Socket events
@@ -190,16 +188,21 @@ $(function() {
 
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', function (data) {
-    addChatMessage(data);
+    add_chat_message(data);
   });
 
   socket.on("clients", function (data) {
-    showClientList(data);
+    show_client_list(data);
   });
 
   socket.on('kicked_off', function (){
-    kickedUser();
+    kicked_user();
   });
 
+  socket.on('load old msgs', function(data){
+    for(var i=data.length-1; i>=0; i--){
+      add_chat_message(data[i]); 
+    }
+  });
 
 });

@@ -30,7 +30,7 @@ ul {
 
 /* Pages */
 
-.pages {
+#pages {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -45,11 +45,11 @@ ul {
 
 /* Login Page */
 
-.login.page {
+#login_page {
   background-color: #000;
 }
 
-.login.page .form {
+#login_page .form {
   height: 100px;
   margin-top: -100px;
   position: absolute;
@@ -59,7 +59,7 @@ ul {
   width: 100%;
 }
 
-.login.page .form .usernameInput {
+#login_page .form input {
   background-color: transparent;
   border: none;
   border-bottom: 2px solid #fff;
@@ -69,33 +69,33 @@ ul {
   width: 400px;
 }
 
-.login.page .title {
+#login_page .title {
   font-size: 200%;
 }
 
-.login.page .usernameInput {
+#login_page input {
   font-size: 200%;
   letter-spacing: 3px;
 }
 
-.login.page .title, .login.page .usernameInput {
+#login_page .title, #login_page input {
   color: #fff;
   font-weight: 100;
 }
 
 /* Chat page */
 
-.chat.page {
+#chat_page {
   display: none;
 }
 
 /* Font */
 
-.messages {
+#messages {
   font-size: 150%;
 }
 
-.inputMessage {
+#input_message {
   font-size: 100%;
 }
 
@@ -108,21 +108,21 @@ ul {
 
 /* Messages */
 
-.chatArea {
+#chat_area {
   height: 100%;
   padding-bottom: 60px;
   float:left;
   min-width: 800px;
 }
 
-.messages {
+#messages {
   height: 100%;
   margin: 0;
   overflow-y: scroll;
   padding: 10px 20px 10px 20px;
 }
 
-.message.typing .messageBody {
+.message.typing .message_body {
   color: gray;
 }
 
@@ -136,7 +136,7 @@ ul {
 
 /* Input */
 
-.inputMessage {
+#input_message {
   border: 10px solid #000;
   bottom: 0;
   height: 60px;
