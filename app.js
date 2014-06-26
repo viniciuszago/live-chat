@@ -14,7 +14,7 @@ var io = io.listen(server);
 
 // Mongodb 
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://chat-homolog.luciliadiniz.com/chat', function(err){
+mongoose.connect('mongodb://127.0.0.1/chat', function(err){
 	err ? console.log(err) : console.log("Conenect to Mongodb");
 });
 

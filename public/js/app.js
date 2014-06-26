@@ -25,7 +25,7 @@ $(function() {
   username = void 0;
   connected = false;
   typing = false;
-  socket = io.connect('http://127.0.0.1:3000/chat');
+  socket = io('/chat');
   set_username = function() {
     var password;
     username = clean_input($username_input.val().trim());
