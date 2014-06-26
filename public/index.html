@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Lucilia Chat</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
   <ul id="pages">
@@ -14,7 +14,11 @@
       <div id="client_area">
         <ul id="client_list"></ul>
       </div>
-      <input id="input_message" placeholder="Digite aqui..."/>
+      <div class="clear"></div>
+      <div id="input_message">
+        <input id="message" placeholder="Digite aqui..."/>
+        <input type="button" id="send_message" value="Enviar"/>
+      </div>
     </li>
     <li id="login_page" class="page">
       <div class="form">
@@ -27,7 +31,7 @@
   </ul>
 
   <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="/main.js"></script>
+  <script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
+  <script src="/js/app.js"></script>
 </body>
 </html>
