@@ -3,7 +3,7 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io');
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 3005;
 
 server.listen(port, function () {
   console.log('Server listening at port %d', port);
@@ -14,7 +14,7 @@ var io = io.listen(server);
 
 // Mongodb 
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1/chat', function(err){
+mongoose.connect('mongodb://chat-homolog.luciliadiniz.com/chat', function(err){
 	err ? console.log(err) : console.log("Conenect to Mongodb");
 });
 

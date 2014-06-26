@@ -38,7 +38,7 @@ $ ->
   username = undefined
   connected = false
   typing = false
-  socket = io.connect('http://127.0.0.1:3000/chat')
+  socket = io.connect('http://chat-homolog.luciliadiniz.com/chat')
 
   # Sets the client's username
   set_username = ->
