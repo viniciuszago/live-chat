@@ -2,12 +2,15 @@
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
-var io = require('socket.io')(server);
+var io = require('socket.io');
 var port = process.env.PORT || 3000;
 
 server.listen(port, function () {
   console.log('Server listening at port %d', port);
 });
+
+var io = io.listen(server);
+
 
 // Mongodb 
 var mongoose = require('mongoose');
@@ -34,41 +37,79 @@ var users = {};
 var numUsers = 0;
 
 chat.on('connection', function (socket) {
-	// Get old messages
-	var query = Chat.find({});
-	query.sort('-created').limit(10).exec( function(err, data){
-		if (err) return console.error(err);
-		socket.emit('load old msgs', data)
-	});
-
   var addedUser = false;
 
   // when the client emits 'new message', this listens and executes
   socket.on('new message', function (data) {
-  	// Save message in Mongodb
-  	msg = new Chat({ username: socket.username, message: data })
+    if (socket.username){
+      // Save message in Mongodb
+      msg = new Chat({ username: socket.username, message: data })
 
-  	msg.save(function(err, msg){
-  		if (err) return console.error(err);
-  		// we tell the client to execute 'new message'
-  		socket.broadcast.emit('new message', {
-	      username: socket.username,
-	      message: data
-	    });	
-  	});
-    
+      msg.save(function(err, msg){
+        if (err) return console.error(err);
+
+        // we tell the client to execute 'new message'
+        socket.emit('new message', {
+          _id: msg._id,
+          username: socket.username,
+          message: data
+        }); 
+
+        socket.broadcast.emit('new message', {
+          _id: msg._id,
+          username: socket.username,
+          message: data
+        }); 
+        console.log("msg_id: " + socket.id)
+        // socket.broadcast.to(socket.id).emit('new message', {
+        //   _id: msg._id,
+        //   username: socket.username,
+        //   message: data
+        // }); 
+      });
+    }  	
   });
+
+   socket.on('remove message', function (id) {
+    var user = users.foo;
+
+    if(user != undefined){
+      if(user.name === 'foo' && user.pass === 'bar'){
+        if(socket.username == user.name){
+          // Save message in Mongodb
+          Chat.findById(id, function (err, msg) {
+            if (err) return console.error(err);
+            var msg_id = msg._id;
+            
+            msg.remove();
+
+            // we tell the client to execute 'remove message'
+            socket.broadcast.emit('remove message', {
+              id: msg_id
+            });  
+
+            console.log("Message removed: " + msg_id);
+          });
+        }
+      }
+    }
+  });  
 
   // when the client emits 'add user', this listens and executes
   socket.on('add user', function (username, password) {
     // we store the username in the socket session for this client
     socket.username = username;
+    Chat.find({}).sort('-created').limit(10).exec( function(err, data){
+      if (err) return console.error(err);
+      
+      socket.emit('load old msgs', data)
+    });
 
     // add the client's username to the global list
     users[username] = {
-    	'name': username,
-      'id': socket.id,
-      'pass': password
+      name: username,
+      id: socket.id,
+      pass: password
     }
     ++numUsers;
     
@@ -79,12 +120,12 @@ chat.on('connection', function (socket) {
     });
 
     // Send updated client list to admin
-		emitClientList();  
+    emitClientList();  
     console.log(username + " connected");
-    console.log("users connected: " + numUsers);	
+    console.log("users connected: " + numUsers);  
   });
 
-  socket.on("remove_user", function(username){
+  socket.on("remove user", function(username){
   	// remove the username from global users list
   	if (addedUser) {
 
@@ -126,10 +167,9 @@ chat.on('connection', function (socket) {
 	    	if(socket.username == user.name){
 	    		socket.emit( 'clients', { users: users } );
 	    	}
-	    	else
-	    	{
-	    		socket.broadcast.to(user.id).emit( 'clients', { users: users } );			
-	    	}
+        else{
+          socket.broadcast.to(user.id).emit( 'clients', { users: users } );     
+        }
     	}	
   	}
   }
