@@ -61,11 +61,6 @@ chat.on('connection', function (socket) {
           message: data
         }); 
         console.log("msg_id: " + socket.id)
-        // socket.broadcast.to(socket.id).emit('new message', {
-        //   _id: msg._id,
-        //   username: socket.username,
-        //   message: data
-        // }); 
       });
     }  	
   });
