@@ -112,6 +112,7 @@ chat.on('connection', function (socket) {
 
     socket.emit('login', {
       numUsers: numUsers
+      
     });
 
     // Send updated client list to admin
