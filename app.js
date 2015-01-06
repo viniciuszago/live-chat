@@ -15,7 +15,7 @@ var io = io.listen(server);
 // Mongodb 
 var mongoose = require('mongoose');
 var db_name = 'heroku_app33064853'
-var mongo_connection = 'mongodb://ds031531.mongolab.com:31531/' + db_name
+var mongo_connection = ' mongodb://heroku_app33064853@ds031531.mongolab.com:31531/' + db_name
 mongoose.connect(mongo_connection, function(err){
 	err ? console.log(err) : console.log("Conenect to Mongodb");
 });
