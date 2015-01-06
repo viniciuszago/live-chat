@@ -235,4 +235,37 @@ $ ->
       i--
     return
 
+  # Testing html speech
+  recognition = new webkitSpeechRecognition()
+  recognition.continuous = true
+  recognizing = false
+    
+  recognition.onstart = ->
+    recognizing = true
+    start_img.src = "./images/mic-animate.gif"
+    return
+
+  recognition.onend = ->
+    recognizing = false
+    start_img.src = "./images/mic.gif"
+    return
+
+  transcription = $("#message")
+  recognition.onresult = (event) ->
+    i = event.resultIndex
+
+    while i < event.results.length
+      console.log event
+      console.log event.results[i][0].transcript
+      transcription.val transcription.val() + event.results[i][0].transcript
+      i++
+    return
+
+  $("#click_to_speak").click ->
+    if recognizing is true
+      recognition.stop()
+    else
+      recognition.start()
+    return
+
   return

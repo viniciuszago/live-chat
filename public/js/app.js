@@ -7,7 +7,7 @@ foobar = function(callback) {
 };
 
 $(function() {
-  var $chat_area, $chat_page, $client_area, $client_list, $input_message, $login_page, $messages, $password_input, $send_message, $username_input, $window, COLORS, FADE_TIME, TYPING_TIMER_LENGTH, add_chat_message, add_message_element, clean_input, connected, get_username_color, kick_user, kicked_user, log, remove_chat_message, remove_message_element, sendMessage, set_username, show_client_list, socket, typing, username;
+  var $chat_area, $chat_page, $client_area, $client_list, $input_message, $login_page, $messages, $password_input, $send_message, $username_input, $window, COLORS, FADE_TIME, TYPING_TIMER_LENGTH, add_chat_message, add_message_element, clean_input, connected, get_username_color, kick_user, kicked_user, log, recognition, recognizing, remove_chat_message, remove_message_element, sendMessage, set_username, show_client_list, socket, transcription, typing, username;
   FADE_TIME = 150;
   TYPING_TIMER_LENGTH = 400;
   COLORS = ["#e21400", "#91580f", "#f8a700", "#f78b00", "#58dc00", "#287b00", "#a8f07a", "#4ae8c4", "#3b88eb", "#3824aa", "#a700ff", "#d300e7"];
@@ -179,6 +179,35 @@ $(function() {
     while (i >= 0) {
       add_chat_message(data[i], remove);
       i--;
+    }
+  });
+  recognition = new webkitSpeechRecognition();
+  recognition.continuous = true;
+  recognizing = false;
+  recognition.onstart = function() {
+    recognizing = true;
+    start_img.src = "./images/mic-animate.gif";
+  };
+  recognition.onend = function() {
+    recognizing = false;
+    start_img.src = "./images/mic.gif";
+  };
+  transcription = $("#message");
+  recognition.onresult = function(event) {
+    var i;
+    i = event.resultIndex;
+    while (i < event.results.length) {
+      console.log(event);
+      console.log(event.results[i][0].transcript);
+      transcription.val(transcription.val() + event.results[i][0].transcript);
+      i++;
+    }
+  };
+  $("#click_to_speak").click(function() {
+    if (recognizing === true) {
+      recognition.stop();
+    } else {
+      recognition.start();
     }
   });
 });
